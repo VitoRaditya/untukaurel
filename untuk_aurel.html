@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Special for Aurel ❤️</title>
+    <style>
+        * { box-sizing: border-box; touch-action: manipulation; }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffe6f2;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* Game Section */
+        #game-container { width: 100%; }
+        .heart-target {
+            font-size: 50px;
+            cursor: pointer;
+            position: absolute;
+            z-index: 10;
+            animation: pulse 0.8s infinite alternate;
+        }
+
+        /* Valentine Card */
+        #valentine-card {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+            width: 95%;
+            max-width: 400px;
+            animation: popIn 0.5s ease-out;
+            margin: auto;
+        }
+
+        /* Photo Gallery Styles */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: rotate(var(--r));
+            border: 1px solid #eee;
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .polaroid p {
+            font-size: 0.7rem;
+            margin: 5px 0 0 0;
+            color: #ff4d94;
+            font-weight: bold;
+        }
+
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #yes-btn { background-color: #ff4d94; color: white; }
+        #no-btn { background-color: #eee; color: #999; }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h2 style="color: #ff4d94;">Ketuk 100 Hati untuk Aurel! 🫵🏻</h2>
+        <h3 id="score-board" style="color: #ff4d94;">Skor: 0 / 100</h3>
+        <div id="game-area"></div>
+    </div>
+
+    <div id="valentine-card">
+        <div id="content-wrap">
+            <div style="font-size: 50px;">✉️</div>
+            <h1>Halo, Aurel Sayang</h1>
+            <p>Kamu berhasil menangkap semua cinta aku wkwkwk</p>
+            <p><strong>Will you be my Valentine?</strong></p>
+            
+            <div class="btn-container">
+                <button id="yes-btn" onclick="celebrate()">MAU BANGET VITO! ❤️</button>
+                <button id="no-btn" onmouseover="moveNoButton()" onclick="moveNoButton()">Gak Mau 😜</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        const targetScore = 16;
+        const scoreBoard = document.getElementById('score-board');
+        const gameContainer = document.getElementById('game-container');
+        const valentineCard = document.getElementById('valentine-card');
+
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.className = 'heart-target';
+            const x = Math.random() * (window.innerWidth - 60);
+            const y = 100 + Math.random() * (window.innerHeight - 200);
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+
+            heart.addEventListener('click', handleCollect);
+            heart.addEventListener('touchstart', handleCollect);
+
+            function handleCollect(e) {
+                e.preventDefault();
+                score++;
+                scoreBoard.innerText = "Skor: " + score + " / 100";
+                heart.remove();
+                if (score < targetScore) spawnHeart();
+                else showValentine();
+            }
+            document.body.appendChild(heart);
+        }
+
+        spawnHeart();
+
+        function showValentine() {
+            gameContainer.style.display = 'none';
+            valentineCard.style.display = 'block';
+        }
+
+        function moveNoButton() {
+            const noBtn = document.getElementById('no-btn');
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        function celebrate() {
+            const wrap = document.getElementById('content-wrap');
+            wrap.innerHTML = `
+                <div style="font-size: 50px;">🤍</div>
+                <h1>Love You my Baby!</h1>
+                <p>ini yang akan kita lakuin</p>
+                
+                <div class="photo-gallery">
+                    <div class="polaroid" style="--r: -3deg">
+                        <img src="Kebun raya bogor.jpg" alt="Foto 1">
+                        <p>strolling around kebun raya bogor !</p>
+                    </div>
+                    <div class="polaroid" style="--r: 2deg">
+                        <img src="surya kencana - bogor.jpg" alt="Foto 2">
+                        <p>jajan di surken :D</p>
+                    </div>
+                    <div class="polaroid" style="--r: -2deg">
+                        <img src="lukis.jpeg" alt="Foto 3">
+                        <p>ngelukis di penalama coffee :O</p>
+                    </div>
+                    <div class="polaroid" style="--r: 4deg">
+                        <img src="street.jpeg" alt="Foto 4">
+                        <p>street photobooth di surken :)</p>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px; font-size: 20px;">taggal dan waktu menyusul secepatnya yaa sayang</div>
+            `;
+            document.body.style.overflowY = "auto";
+        }
+    </script>
+</body>
+</html>
