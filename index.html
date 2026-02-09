@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Special for Aurel ❤️</title>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            margin: 0; padding: 10px; font-family: 'Arial', sans-serif;
+            background-color: #ffe6f2; overflow-x: hidden;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; text-align: center;
+        }
+
+        #game-container, #flappy-wrapper, #valentine-card { 
+            width: 100%; 
+            max-width: 400px; 
+            position: relative;
+        }
+
+        #valentine-card {
+            display: none; background: white; padding: 20px; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+            animation: popIn 0.5s ease-out; margin: auto;
+        }
+
+        .heart-target {
+            font-size: 50px; cursor: pointer; position: absolute; z-index: 10;
+            animation: pulse 0.8s infinite alternate;
+            user-select: none;
+        }
+
+        .photo-gallery { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        .polaroid {
+            background: white; padding: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: rotate(var(--r)); border: 1px solid #eee;
+        }
+        .polaroid img { width: 100%; height: 90px; object-fit: cover; border-radius: 3px; }
+        .polaroid p { font-size: 0.55rem; margin: 5px 0 0 0; color: #ff4d94; font-weight: bold; line-height: 1.1; }
+
+        .btn-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        button { 
+            padding: 15px; font-size: 1rem; border: none; border-radius: 15px; 
+            font-weight: bold; cursor: pointer; transition: 0.2s; 
+        }
+        button:active { transform: scale(0.95); }
+
+        #yes-btn { background-color: #ff4d94; color: white; }
+        #no-btn { background-color: #eee; color: #999; }
+        .date-btn { background-color: #ff85b3; color: white; width: 100%; }
+        
+        .retry-btn { background-color: #70c5ce; color: white; margin-top: 10px; width: 100%; }
+        .back-btn { background-color: #aaa; color: white; margin-top: 5px; width: 100%; }
+
+        #flappy-wrapper { display: none; flex-direction: column; align-items: center; width: 100%; }
+        #flappy-canvas { 
+            background: #70c5ce; border: 4px solid white; border-radius: 10px; 
+            width: 100%; max-width: 320px; height: auto; touch-action: none;
+        }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h2 style="color: #ff4d94; font-size: 1.2rem;">Ketuk 100 Hati untuk Aurel! 🫵🏻</h2>
+        <h3 id="score-board" style="color: #ff4d94; font-size: 1rem;">Skor: 0 / 100</h3>
+        <div id="game-area"></div>
+    </div>
+
+    <div id="valentine-card">
+        <div id="content-wrap">
+            <div style="font-size: 40px;">✉️</div>
+            <h1 style="font-size: 1.5rem; color: #ff4d94;">Halo, Aurel Sayang</h1>
+            <p style="font-size: 0.9rem;">Kamu berhasil menangkap semua cinta aku wkwkwk</p>
+            <p><strong>Will you be my Valentine?</strong></p>
+            <div class="btn-container">
+                <button id="yes-btn" onclick="celebrate()">MAU BANGET VITO! ❤️</button>
+                <button id="no-btn" onmouseover="moveNoButton()" onclick="moveNoButton()">Gak Mau 😜</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="flappy-wrapper">
+        <h2 id="flappy-instr" style="color: #ff4d94; font-size: 1rem;">Klik/Tap untuk Terbang!<br>Skor: 0</h2>
+        <canvas id="flappy-canvas" width="320" height="480"></canvas>
+        <div id="game-over-ui" style="display:none; margin-top: 15px; width: 100%; max-width: 320px;"></div>
+    </div>
+
+    <script>
+        let score = 0;
+        const targetScore = 14; 
+        const scoreBoard = document.getElementById('score-board');
+        const gameContainer = document.getElementById('game-container');
+        const valentineCard = document.getElementById('valentine-card');
+        const flappyWrapper = document.getElementById('flappy-wrapper');
+
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.className = 'heart-target';
+            const x = Math.random() * (window.innerWidth - 70);
+            const y = 80 + Math.random() * (window.innerHeight - 180);
+            heart.style.left = x + 'px'; heart.style.top = y + 'px';
+            
+            const handleCollect = (e) => {
+                e.preventDefault();
+                score++;
+                scoreBoard.innerText = "Skor: " + score + " / 100";
+                heart.remove();
+                if (score < targetScore) spawnHeart(); else showValentine();
+            };
+            
+            heart.onclick = handleCollect;
+            heart.ontouchstart = handleCollect;
+            document.body.appendChild(heart);
+        }
+        spawnHeart();
+
+        function showValentine() {
+            gameContainer.style.display = 'none';
+            valentineCard.style.display = 'block';
+            flappyWrapper.style.display = 'none';
+        }
+
+        function moveNoButton() {
+            const noBtn = document.getElementById('no-btn');
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            noBtn.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+        }
+
+        function celebrate() {
+            const wrap = document.getElementById('content-wrap');
+            wrap.innerHTML = `
+                <div style="font-size: 40px;">🤍</div>
+                <h1 style="font-size: 1.4rem;">Love You my Baby!</h1>
+                <p style="font-size: 0.9rem;">ini yang akan kita lakuin</p>
+                <div class="photo-gallery">
+                    <div class="polaroid" style="--r:-3deg"><img src="Kebun raya bogor.jpg"><p>strolling around kebun raya bogor!</p></div>
+                    <div class="polaroid" style="--r:2deg"><img src="surya kencana - bogor.jpg"><p>jajan di surken :D</p></div>
+                    <div class="polaroid" style="--r:-2deg"><img src="lukis.jpeg"><p>ngelukis di penalama coffee :O</p></div>
+                    <div class="polaroid" style="--r:4deg"><img src="street.jpeg"><p>street photobooth di surken :)</p></div>
+                </div>
+                <button class="date-btn" onclick="startFlappyGame()">Lihat tanggal dan waktu di sini</button>
+            `;
+        }
+
+        let flappyId;
+        function startFlappyGame() {
+            valentineCard.style.display = 'none';
+            flappyWrapper.style.display = 'flex';
+            document.getElementById('game-over-ui').style.display = 'none';
+            document.getElementById('flappy-instr').style.display = 'block';
+            initFlappy();
+        }
+
+        function initFlappy() {
+            const canvas = document.getElementById('flappy-canvas');
+            const ctx = canvas.getContext('2d');
+            const birdImg = new Image();
+            birdImg.src = 'aurel1.jpeg'; 
+
+            let birdY = 200, velocity = 0, gravity = 0.25, jump = -4.8;
+            let pipes = [], frames = 0, flappyScore = 0, gameActive = true;
+
+            function draw() {
+                if (!gameActive) return;
+                ctx.fillStyle = "#70c5ce"; ctx.fillRect(0,0,canvas.width,canvas.height);
+                
+                velocity += gravity; birdY += velocity;
+                ctx.save();
+                ctx.translate(50, birdY);
+                ctx.drawImage(birdImg, -20, -20, 40, 40);
+                ctx.restore();
+
+                if (frames % 95 === 0) {
+                    let gap = 130; 
+                    let pipeTop = Math.random() * (canvas.height - 250) + 50;
+                    
+                    // LOGIKA SKOR 23: Pipa berikutnya (yang menuju skor 24) tertutup rapat
+                    if (flappyScore === 23) { 
+                        gap = 0; 
+                        pipeTop = canvas.height/2; 
+                    } 
+                    // Jika skor sudah 24 (misal dia entah gimana lolos), pipa berikutnya terbuka lagi seolah-olah normal
+                    else if (flappyScore > 23) {
+                        gap = 130;
+                    }
+
+                    pipes.push({ x: canvas.width, y: pipeTop, gap: gap });
+                }
+
+                pipes.forEach((p, i) => {
+                    p.x -= 2;
+                    ctx.fillStyle = "#2ecc71";
+                    ctx.fillRect(p.x, 0, 50, p.y); 
+                    ctx.fillRect(p.x, p.y + p.gap, 50, canvas.height); 
+                    
+                    if (50 + 15 > p.x && 50 - 15 < p.x + 50) {
+                        if (birdY - 15 < p.y || birdY + 15 > p.y + p.gap) gameOver();
+                    }
+                    if (p.x === 50) { 
+                        flappyScore++; 
+                        document.getElementById('flappy-instr').innerHTML = `Skor: ${flappyScore}`; 
+                    }
+                    if (p.x < -50) pipes.splice(i, 1);
+                });
+
+                if (birdY > canvas.height || birdY < -20) gameOver();
+                frames++;
+                flappyId = requestAnimationFrame(draw);
+            }
+
+            function gameOver() {
+                gameActive = false;
+                cancelAnimationFrame(flappyId);
+                const ui = document.getElementById('game-over-ui');
+                ui.style.display = 'block';
+                document.getElementById('flappy-instr').style.display = 'none';
+
+                // Jika sudah skor 23, dianggap menang meskipun menabrak pipa 24
+                if (flappyScore >= 23) {
+                    ui.innerHTML = `
+                        <div style="background:white; padding:20px; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1)">
+                            <h1 style="color:#ff4d94; font-size: 1.3rem;">Yah gimana sii kamuu</h1>
+                            <p style="font-size: 0.9rem;">Tapi gapapaa wkwkwk, ini jadwal main kita</p>
+                            <h2 style="background:#ff4d94; color:white; padding:12px; border-radius:12px; font-size: 1.1rem;">
+                                12 Februari 2026
+                            </h2>
+                            <p style="font-size: 0.85rem;">Sampai ketemu nanti yaa sayaang love you ❤️</p>
+                        </div>
+                    `;
+                } else {
+                    ui.innerHTML = `
+                        <div style="background:#ff4d94; color:white; padding:20px; border-radius:15px;">
+                            <h3 style="margin-top:0;">Aurel jatuh! 😱</h3>
+                            <p>Skor kamu baru ${flappyScore}. <br> Ayo coba lagi sampai skor 100!</p>
+                            <button class="retry-btn" onclick="startFlappyGame()">Main lagi vitoo :(</button>
+                            <button class="back-btn" onclick="showValentine()">Ingat ini alasan kamu</button>
+                        </div>
+                    `;
+                }
+            }
+
+            const jumpAction = (e) => { 
+                if(gameActive) { 
+                    e.preventDefault(); 
+                    velocity = jump; 
+                } 
+            };
+            canvas.onmousedown = jumpAction;
+            canvas.ontouchstart = jumpAction;
+            
+            birdImg.onload = () => draw();
+            birdImg.onerror = () => draw(); 
+        }
+    </script>
+</body>
+</html>
