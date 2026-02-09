@@ -168,7 +168,7 @@
             initFlappy();
         }
 
-        function initFlappy() {
+function initFlappy() {
             const canvas = document.getElementById('flappy-canvas');
             const ctx = canvas.getContext('2d');
             const birdImg = new Image();
@@ -176,6 +176,7 @@
 
             let birdY = 200, velocity = 0, gravity = 0.25, jump = -4.8;
             let pipes = [], frames = 0, flappyScore = 0, gameActive = true;
+            let pipeCount = 0; // Tambahkan ini untuk menghitung pipa yang lahir
 
             function draw() {
                 if (!gameActive) return;
@@ -188,16 +189,17 @@
                 ctx.restore();
 
                 if (frames % 95 === 0) {
+                    pipeCount++; // Setiap pipa baru lahir, hitung
                     let gap = 130; 
                     let pipeTop = Math.random() * (canvas.height - 250) + 50;
                     
-                    // LOGIKA SKOR 23: Pipa berikutnya (yang menuju skor 24) tertutup rapat
-                    if (flappyScore === 23) { 
+                    // Pipa ke-24 adalah pipa jebakan
+                    if (pipeCount === 24) { 
                         gap = 0; 
-                        pipeTop = canvas.height/2; 
+                        pipeTop = canvas.height / 2; 
                     } 
-                    // Jika skor sudah 24 (misal dia entah gimana lolos), pipa berikutnya terbuka lagi seolah-olah normal
-                    else if (flappyScore > 23) {
+                    // Pipa setelah 24 (jika ada) terbuka lagi seolah-olah normal
+                    else {
                         gap = 130;
                     }
 
@@ -210,9 +212,14 @@
                     ctx.fillRect(p.x, 0, 50, p.y); 
                     ctx.fillRect(p.x, p.y + p.gap, 50, canvas.height); 
                     
+                    // Cek Tabrakan
                     if (50 + 15 > p.x && 50 - 15 < p.x + 50) {
-                        if (birdY - 15 < p.y || birdY + 15 > p.y + p.gap) gameOver();
+                        if (birdY - 15 < p.y || birdY + 15 > p.y + p.gap) {
+                            gameOver();
+                        }
                     }
+                    
+                    // Skor bertambah saat berhasil melewati pipa
                     if (p.x === 50) { 
                         flappyScore++; 
                         document.getElementById('flappy-instr').innerHTML = `Skor: ${flappyScore}`; 
@@ -232,23 +239,23 @@
                 ui.style.display = 'block';
                 document.getElementById('flappy-instr').style.display = 'none';
 
-                // Jika sudah skor 23, dianggap menang meskipun menabrak pipa 24
+                // Syarat Menang: Jika sudah sampai skor 23 (dan menabrak pipa 24)
                 if (flappyScore >= 23) {
                     ui.innerHTML = `
                         <div style="background:white; padding:20px; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1)">
-                            <h1 style="color:#ff4d94; font-size: 1.3rem;">Yah gimana sii kamuu</h1>
-                            <p style="font-size: 0.9rem;">Tapi gapapaa wkwkwk, ini jadwal main kita</p>
+                            <h1 style="color:#ff4d94; font-size: 1.3rem;">kok kamu nabrakk</h1>
+                            <p style="font-size: 0.9rem;">Tapi gapapaaa, ini jadwal main kita yaa</p>
                             <h2 style="background:#ff4d94; color:white; padding:12px; border-radius:12px; font-size: 1.1rem;">
                                 12 Februari 2026
                             </h2>
-                            <p style="font-size: 0.85rem;">Sampai ketemu nanti yaa sayaang love you ❤️</p>
+                            <p style="font-size: 0.85rem;">Sampai ketemu nanti sayaang love you ❤️</p>
                         </div>
                     `;
                 } else {
                     ui.innerHTML = `
                         <div style="background:#ff4d94; color:white; padding:20px; border-radius:15px;">
                             <h3 style="margin-top:0;">Aurel jatuh! 😱</h3>
-                            <p>Skor kamu baru ${flappyScore}. <br> Ayo coba lagi sampai skor 100!</p>
+                            <p>Skor kamu baru ${flappyScore} <br> Ayo coba lagi sampai skor 100 yaa sayaang wkwkwk</p>
                             <button class="retry-btn" onclick="startFlappyGame()">Main lagi vitoo :(</button>
                             <button class="back-btn" onclick="showValentine()">Ingat ini alasan kamu</button>
                         </div>
@@ -266,9 +273,7 @@
             canvas.ontouchstart = jumpAction;
             
             birdImg.onload = () => draw();
-            birdImg.onerror = () => draw(); 
         }
     </script>
 </body>
-
 </html>
